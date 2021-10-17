@@ -24,7 +24,7 @@ class BlockController extends Controller
         $file          = $request->file('files')->store('files');
         $data          = json_encode(['data_user' => $request->input('data_user'), 'file' => $file]);
 
-        $previousBlock = json_encode(['key_previous_block' => '0', 'hash_previous_block' => ""]);
+        $previousBlock = json_encode(['key_previous_block' => "", 'hash_previous_block' => ""]);
 
         $hash          = $this->generateHash(data: $data, previousBlock: $previousBlock);
 
@@ -61,44 +61,48 @@ class BlockController extends Controller
 
         $validateChain = $model->first();
 
-        if(($validateChain['public_key'] == $previousKey) && ($validateChain['hash'] == $previousHash)){
+        if($validateChain){
 
-            $blocks = [json_decode($validateChain['previousBlock'])];
+            if(($validateChain['public_key'] == $previousKey) && ($validateChain['hash'] == $previousHash)){
 
-            $registers = [];
+                $blocks = [json_decode($validateChain['previousBlock'])];
+    
+                $blockHistory = [];
+    
+                if(is_array($blocks[0])){
+    
+                    foreach($blocks[0] as $register){
+                    
+                        $blockHistory[] = $register;
 
-            foreach($blocks[0] as $register){
-                
-                if($register[0]->key_previous_block == 0){
-                    continue; 
-                }else{
-                    $registers[] = $register;
+                    }
+    
                 }
-            }
-
-            return $registers;
-
-            $blockHistory = [$registers];
-            array_push($blockHistory[0], $previousBlock);
+    
+                array_push($blockHistory, $previousBlock);
+    
+                try{
+    
+                    $currentDate = new DateTime();
             
-            try{
-
-                $currentDate = new DateTime();
-        
-                Block::create(['hash' => $hash,
-                                'data' => $data,
-                                'previousBlock' => json_encode($blockHistory),
-                                'created' => $currentDate->format('Y-m-d H:i:s')]);
-        
+                    Block::create(['hash' => $hash,
+                                    'data' => $data,
+                                    'previousBlock' => json_encode($blockHistory),
+                                    'created' => $currentDate->format('Y-m-d H:i:s')]);
             
-                return response(content: ['generate' => true], status: 201);
-            
-            }catch(Exception $e){
-                return response(content: ['generate' => false, 'error' => $e->getMessage()], status: 500);
+                
+                    return response(content: ['generate' => true], status: 201);
+                
+                }catch(Exception $e){
+                    return response(content: ['generate' => false, 'error' => $e->getMessage()], status: 500);
+                }
+    
+            }else{
+                return response(content: ['generate' => false, 'error' => 'No existe esa cadena.'], status: 404);
             }
 
         }else{
-            return response(content: ['generate' => false, 'error' => 'No existe esa cadena.'], status: 404);
+            return response(content: ['generate' => false, 'error' => 'No existe ese bloque.'], status: 404);
         }
 
     }
@@ -107,6 +111,8 @@ class BlockController extends Controller
     {
         return Block::all();
     }
+
+    public function getChain($)
 
 
 }
