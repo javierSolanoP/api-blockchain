@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post(uri: '/blocksGenesis/v1', action: [BlockController::class, 'generateGenesis']);
-Route::get(uri: '/blocks/v1', action: [BlockController::class, 'getBlocks']);
 
+Route::get(uri: '/blocks/v1', action: [BlockController::class, 'getBlocks']);
 Route::post(uri: '/blocks/v1', action: [BlockController::class, 'generateBlock']);
+Route::get(uri: '/blocks-chains/v1/{public_key}/{hash}', action: [BlockController::class, 'getChain']);

@@ -109,10 +109,24 @@ class BlockController extends Controller
 
     public function getBlocks()
     {
-        return Block::all();
+        $model = Block::all();
+        return response(content: ['query' => true, 'blocks' => $model], status:200);
     }
 
-    public function getChain($)
+    public function getChain($public_key, $hash)
+    {
+        $model = Block::select('previousBlock as chain')->where('public_key', $public_key)->where('hash', $hash);
 
+        $validateChain = $model->first();
 
+        if($validateChain){
+
+            return response(content: ['query' => true, 'chain' => json_decode($validateChain['chain'])], status: 200);
+
+        }else{
+            return response(content: ['query' => false, 'error' => 'No existe esa cadena.'], status: 404);
+        }
+
+    }
+    
 }
