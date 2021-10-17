@@ -19,4 +19,4 @@ Route::post(uri: '/blocksGenesis/v1', action: [BlockController::class, 'generate
 
 Route::get(uri: '/blocks/v1', action: [BlockController::class, 'getBlocks']);
 Route::post(uri: '/blocks/v1', action: [BlockController::class, 'generateBlock']);
-Route::get(uri: '/blocks-chains/v1/{public_key}/{hash}', action: [BlockController::class, 'getChain']);
+Route::get(uri: '/blocks-chain/v1/{public_key}/{hash}', action: [BlockController::class, 'getChain']);
