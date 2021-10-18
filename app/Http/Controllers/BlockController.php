@@ -19,10 +19,36 @@ class BlockController extends Controller
     }
 
     // Metodo para generar un bloque 'Genesis': 
+    // public function generateGenesis($request)
+    // {
+    //     $datas = json_decode($request);
+    //     $file          = $datas['file']->store('files');
+    //     $data          = json_encode(['data_user' => $datas['data_user'], 'file' => $file]);
+
+    //     $previousBlock = json_encode(['key_previous_block' => "", 'hash_previous_block' => ""]);
+
+    //     $hash          = $this->generateHash(data: $data, previousBlock: $previousBlock);
+
+    //     try{
+
+    //         $currentDate = new DateTime();
+
+    //         Block::create(['hash' => $hash,
+    //                         'data' => $data,
+    //                         'previousBlock' => $previousBlock,
+    //                         'created' => $currentDate->format('Y-m-d H:i:s')]);
+
+    //         return response(content: ['generate' => true], status: 201);
+
+    //     }catch(Exception $e){
+    //         return response(content: ['generate' => false, 'error' => $e->getMessage()], status: 500);
+    //     }
+
+    // }
+
     public function generateGenesis(Request $request)
     {
-        $file          = $request->file('files')->store('files');
-        $data          = json_encode(['data_user' => $request->input('data_user'), 'file' => $file]);
+        $data          = json_encode(['data_user' => $request->input('data_user'), 'file' =>  $request->input('file')]);
 
         $previousBlock = json_encode(['key_previous_block' => "", 'hash_previous_block' => ""]);
 
@@ -47,8 +73,7 @@ class BlockController extends Controller
 
     public function generateBlock(Request $request)
     {
-        $file          = $request->file('files')->store('files');
-        $data          = json_encode(['data_user' => $request->input(key: 'data_user'), 'file' => $file]);
+        $data          = json_encode(['data_user' => $request->input(key: 'data_user'), 'file' => $request->input('files')]);
         
         $previousBlock = ['key_previous_block' => $request->input(key: 'key_previous_block'), 'hash_previous_block' => $request->input(key: 'hash_previous_block')];
         
