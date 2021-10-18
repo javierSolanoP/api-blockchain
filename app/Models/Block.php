@@ -12,7 +12,7 @@ class Block extends Model
     protected $fillable = [
         'hash',
         'data',
-        'previousBlock',
+        'previous_block',
         'created'
     ];
 

@@ -18,7 +18,7 @@ class CreateBlocksTable extends Migration
             $table->id('public_key');
             $table->string('hash');
             $table->binary('data');
-            $table->binary('previousBlock');
+            $table->binary('previous_block');
             $table->dateTime('created');
             $table->timestamps();
         });

@@ -30,7 +30,7 @@ Genera el primer bloque de una cadena:
 ```
  {
     "data_user" : json,
-    "file" : file
+    "file" : string
  }
 ```
 
@@ -46,9 +46,9 @@ Genera una cadena de un bloque 'Genesis' o una subcadena de una cadena existente
 ```
  {
     "data_user" : json,
-    "key_previous_block" : int,
-    "hash_previous_block" : string,
-    "file" : file
+    "public_key_previous_block" : int,
+    "private_key_previous_block" : string,
+    "file" : string
  }
 ```
 
@@ -59,11 +59,25 @@ Obtiene todos los bloques de la base de datos:
 GET : http://localhost/blocks/v1
  ```
 
+ - Obtener un bloque específico: 
+
+Obtiene el bloque solicitado. Lo que se encuentra entre '{ }', es el parametro  que recibirá el argumento correspondiente:   
+ ```
+GET : http://localhost/blocks/v1/{public_key}
+ ```
+
+ - Obtener los datos de un bloque específico: 
+
+Obtiene el bloque solicitado. Lo que se encuentra entre '{ }', es el parametro  que recibirá el argumento correspondiente:   
+ ```
+GET : http://localhost/data-blocks/v1/{private_key}
+ ```
+
 - Obtener una cadena de bloques: 
 
-Obtiene el historial de toda la cadena del último bloque. Lo que se encuentra entre '{ }', son los parametros que se requieren: 
+Obtiene el historial de toda la cadena del último bloque. Lo que se encuentra entre '{ }', son los parametros  que recibirán los argumentos correspondientes:   
  ```
-GET : http://localhost/blocks-chain/v1/{public_key}/{hash}
+GET : http://localhost/blocks-chain/v1/{public_key}/{private_key}
  ```
 
 

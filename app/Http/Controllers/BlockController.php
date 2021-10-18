@@ -50,7 +50,7 @@ class BlockController extends Controller
     {
         $data          = json_encode(['data_user' => $request->input('data_user'), 'file' =>  $request->input('file')]);
 
-        $previousBlock = json_encode(['key_previous_block' => "", 'hash_previous_block' => ""]);
+        $previousBlock = json_encode(['public_key_previous_block' => "", 'private_key_previous_block' => ""]);
 
         $hash          = $this->generateHash(data: $data, previousBlock: $previousBlock);
 
@@ -60,7 +60,7 @@ class BlockController extends Controller
 
             Block::create(['hash' => $hash,
                             'data' => $data,
-                            'previousBlock' => $previousBlock,
+                            'previous_block' => $previousBlock,
                             'created' => $currentDate->format('Y-m-d H:i:s')]);
 
             return response(content: ['generate' => true], status: 201);
@@ -73,14 +73,14 @@ class BlockController extends Controller
 
     public function generateBlock(Request $request)
     {
-        $data          = json_encode(['data_user' => $request->input(key: 'data_user'), 'file' => $request->input('files')]);
+        $data          = json_encode(['data_user' => $request->input(key: 'data_user'), 'file' => $request->input('file')]);
         
-        $previousBlock = ['key_previous_block' => $request->input(key: 'key_previous_block'), 'hash_previous_block' => $request->input(key: 'hash_previous_block')];
+        $previousBlock = ['public_key_previous_block' => $request->input(key: 'public_key_previous_block'), 'private_key_previous_block' => $request->input(key: 'private_key_previous_block')];
         
         $hash          = $this->generateHash(data: $data, previousBlock: $previousBlock);
 
-        $previousHash  = $previousBlock['hash_previous_block'];
-        $previousKey   = $previousBlock['key_previous_block'];
+        $previousHash  = $previousBlock['private_key_previous_block'];
+        $previousKey   = $previousBlock['public_key_previous_block'];
 
         $model = Block::where('hash', $previousHash);
 
@@ -90,7 +90,7 @@ class BlockController extends Controller
 
             if(($validateChain['public_key'] == $previousKey) && ($validateChain['hash'] == $previousHash)){
 
-                $blocks = [json_decode($validateChain['previousBlock'])];
+                $blocks = [json_decode($validateChain['previous_block'])];
     
                 $blockHistory = [];
     
@@ -112,7 +112,7 @@ class BlockController extends Controller
             
                     Block::create(['hash' => $hash,
                                     'data' => $data,
-                                    'previousBlock' => json_encode($blockHistory),
+                                    'previous_block' => json_encode($blockHistory),
                                     'created' => $currentDate->format('Y-m-d H:i:s')]);
             
                 
@@ -134,13 +134,14 @@ class BlockController extends Controller
 
     public function getBlocks()
     {
-        $model = Block::all();
+        $model = Block::select('public_key', 'hash as private_key')->get();
         return response(content: ['query' => true, 'blocks' => $model], status:200);
     }
 
-    public function getChain($public_key, $hash)
+    public function getChain($public_key, $private_key)
     {
-        $model = Block::select('previousBlock as chain')->where('public_key', $public_key)->where('hash', $hash);
+        $model = Block::select('previous_block as chain')->where('public_key', $public_key)->where('hash', $private_key)->orderBy('chain', 'desc')
+        ;
 
         $validateChain = $model->first();
 
@@ -152,6 +153,38 @@ class BlockController extends Controller
             return response(content: ['query' => false, 'error' => 'No existe esa cadena.'], status: 404);
         }
 
+    }
+
+    // Metodo para obtener un bloque especifico: 
+    public function getBlock($public_key)
+    {
+        $model = Block::select('hash as private_key')->where('public_key', $public_key);
+
+        $validateBlock = $model->first();
+
+        if($validateBlock){
+
+            return response(content: ['query' => true, 'block' => $validateBlock], status: 200);
+
+        }else{
+            return response(content: ['query' => false, 'error' => 'No existe ese bloque.'], status: 404);
+        }
+    }
+
+    // Metodo para obtener los datos de un contenedor: 
+    public function getData($private_key)
+    {
+        $model = Block::select('data')->where('hash', $private_key);
+
+        $validateBlock = $model->first();
+
+        if($validateBlock){
+
+            return response(content: ['query' => true, 'data' => $validateBlock], status: 200);
+
+        }else{
+            return response(content: ['query' => false, 'error' => 'No existe ese bloque.'], status: 404);
+        }
     }
     
 }
